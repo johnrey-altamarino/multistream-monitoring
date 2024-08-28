@@ -260,87 +260,88 @@
       alertSound.pause();
       alertSound.currentTime = 0; // Reset the sound to the start
     }
-    
-
-    
 
     function createStreams(rows, cols) {
-      const container = document.getElementById('streamsContainer');
-      container.innerHTML = ''; // Clear existing streams
-      container.setAttribute('data-rows', rows);
-      container.setAttribute('data-cols', cols);
-  
-      const totalStreams = rows * cols;
-      for (let i = 1; i <= totalStreams; i++) {
-          const streamBox = document.createElement('div');
-          streamBox.className = 'stream-box';
-  
-          const streamContent = document.createElement('div');
-          streamContent.className = 'stream-content';
-  
-          const video = document.createElement('video');
-          video.id = `video${i}`;
-          video.controls = false;
-          video.autoplay = true;
-          video.muted = false;
-          video.playsInline = true;
-          streamContent.appendChild(video);
-  
-          const audioMeter = document.createElement('div');
-          audioMeter.className = 'audio-meter';
-  
-          // Create two bars for left and right channels
-          const leftBar = document.createElement('div');
-          leftBar.className = 'bar';
-          const rightBar = document.createElement('div');
-          rightBar.className = 'bar';
-  
-          audioMeter.appendChild(leftBar);
-          audioMeter.appendChild(rightBar);
-  
-          streamContent.appendChild(audioMeter);
-  
-          const alertText = document.createElement('div');
-          alertText.className = 'alert-text';
-          alertText.textContent = 'Alert: High Audio Level Detected!';
-          streamBox.appendChild(alertText);
-  
-          const controls = document.createElement('div');
-          controls.className = 'controls';
-  
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.className = 'form-control';
-          input.placeholder = `Signal URL for Stream ${i}`;
-          input.value = `http://livep2p-pull.8686c.com/live/cctest${i}.sdp`;
-          input.id = `signal_url${i}`;
-          controls.appendChild(input);
-  
-          const playBtn = document.createElement('button');
-          playBtn.className = 'btn btn-success';
-          playBtn.textContent = 'Play';
-          playBtn.onclick = function () {
-              playStream(i);
-          };
-          controls.appendChild(playBtn);
-  
-          const stopBtn = document.createElement('button');
-          stopBtn.className = 'btn btn-danger';
-          stopBtn.textContent = 'Stop';
-          stopBtn.onclick = function () {
-              stopStream(i);
-          };
-          controls.appendChild(stopBtn);
-  
-          streamContent.appendChild(controls);
-          streamBox.appendChild(streamContent);
-          container.appendChild(streamBox);
-      }
-  
-      container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      container.style.gridTemplateRows = `repeat(${rows}, auto)`; // Adjust row height based on content
+  const container = document.getElementById('streamsContainer');
+  container.innerHTML = ''; // Clear existing streams
+  container.setAttribute('data-rows', rows);
+  container.setAttribute('data-cols', cols);
+
+  const totalStreams = rows * cols;
+  for (let i = 1; i <= totalStreams; i++) {
+    const streamBox = document.createElement('div');
+    streamBox.className = 'stream-box';
+
+    const streamContent = document.createElement('div');
+    streamContent.className = 'stream-content';
+
+    const video = document.createElement('video');
+    video.id = `video${i}`;
+    video.controls = false;
+    video.autoplay = true;
+    video.muted = false;
+    video.playsInline = true;
+    streamContent.appendChild(video);
+
+    const audioMeter = document.createElement('div');
+    audioMeter.className = 'audio-meter';
+
+    const leftBar = document.createElement('div');
+    leftBar.className = 'bar';
+    const rightBar = document.createElement('div');
+    rightBar.className = 'bar';
+
+    audioMeter.appendChild(leftBar);
+    audioMeter.appendChild(rightBar);
+
+    streamContent.appendChild(audioMeter);
+
+    const alertText = document.createElement('div');
+    alertText.className = 'alert-text';
+    alertText.textContent = 'Alert: High Audio Level Detected!';
+    streamBox.appendChild(alertText);
+
+    // Add bitrate status
+    const bitrateStatus = document.createElement('div');
+    bitrateStatus.className = 'bitrate-status';
+    bitrateStatus.textContent = 'Bitrate: N/A';
+    streamContent.appendChild(bitrateStatus);
+
+    const controls = document.createElement('div');
+    controls.className = 'controls';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'form-control';
+    input.placeholder = `Signal URL for Stream ${i}`;
+    input.value = `http://livep2p-pull.8686c.com/live/cctest${i}.sdp`;
+    input.id = `signal_url${i}`;
+    controls.appendChild(input);
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'btn btn-success';
+    playBtn.textContent = 'Play';
+    playBtn.onclick = function () {
+      playStream(i);
+    };
+    controls.appendChild(playBtn);
+
+    const stopBtn = document.createElement('button');
+    stopBtn.className = 'btn btn-danger';
+    stopBtn.textContent = 'Stop';
+    stopBtn.onclick = function () {
+      stopStream(i);
+    };
+    controls.appendChild(stopBtn);
+
+    streamContent.appendChild(controls);
+    streamBox.appendChild(streamContent);
+    container.appendChild(streamBox);
   }
-  
+
+  container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  container.style.gridTemplateRows = `repeat(${rows}, auto)`; // Adjust row height based on content
+}
 
     let players = [];
     let alerts = [];
@@ -408,14 +409,15 @@
     }
 
     function monitorStream(index, stream, alertSoundPath = 'default_alert_sound.mp3') {
-    const videoElement = document.getElementById(`video${index}`);
-    const streamBox = videoElement.closest('.stream-box');
-    const alertText = streamBox.querySelector('.alert-text');
-    const audioMeter = streamBox.querySelector('.audio-meter');
+      const videoElement = document.getElementById(`video${index}`);
+      const streamBox = videoElement.closest('.stream-box');
+      const alertText = streamBox.querySelector('.alert-text');
+      const audioMeter = streamBox.querySelector('.audio-meter');
+      const bitrateStatus = streamBox.querySelector('.bitrate-status');
 
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    let source;
-    if (stream.getAudioTracks().length > 0) {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      let source;
+      if (stream.getAudioTracks().length > 0) {
         source = audioContext.createMediaStreamSource(stream);
         const analyser = audioContext.createAnalyser();
         source.connect(analyser);
@@ -428,146 +430,139 @@
         let blackScreenDuration = 0;
         const alertDuration = 100; // 100 milliseconds
 
-        // Set up the alert sound
-        const alertSound = new Audio("./alert.mp3"); // Use the provided path
-        alertSound.loop = true; // Optional: loop the sound until the issue is resolved
+        const alertSound = new Audio("./alert.mp3");
+        alertSound.loop = true;
 
-        // Create a canvas to analyze the video frames
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = videoElement.videoWidth || 640;
         canvas.height = videoElement.videoHeight || 480;
 
         function checkStream() {
-            analyser.getByteFrequencyData(dataArray);
+          analyser.getByteFrequencyData(dataArray);
 
-            // Assuming stereo audio, interleaved samples:
-            const leftChannelData = [];
-            const rightChannelData = [];
+          const leftChannelData = [];
+          const rightChannelData = [];
 
-            for (let i = 0; i < bufferLength; i += 2) {
-                leftChannelData.push(dataArray[i]);    // Left channel data
-                rightChannelData.push(dataArray[i + 1]); // Right channel data
+          for (let i = 0; i < bufferLength; i += 2) {
+            leftChannelData.push(dataArray[i]);
+            rightChannelData.push(dataArray[i + 1]);
+          }
+
+          const leftChannelSum = leftChannelData.reduce((a, b) => a + b, 0);
+          const rightChannelSum = rightChannelData.reduce((a, b) => a + b, 0);
+
+          const leftChannelAvg = leftChannelSum / leftChannelData.length;
+          const rightChannelAvg = rightChannelSum / rightChannelData.length;
+
+          const scaleAudioLevel = level => Math.min(100, Math.log10(1 + level) * 35);
+
+          const leftLevel = scaleAudioLevel(leftChannelAvg);
+          const rightLevel = scaleAudioLevel(rightChannelAvg);
+
+          console.log(`Stream ${index} Left Audio Level: ${leftLevel}, Right Audio Level: ${rightLevel}`);
+
+          const leftBar = audioMeter.querySelector('.bar:first-child');
+          const rightBar = audioMeter.querySelector('.bar:last-child');
+
+          if (leftBar && rightBar) {
+            leftBar.style.height = `${leftLevel}%`;
+            rightBar.style.height = `${rightLevel}%`;
+          }
+
+          if (leftLevel < 5 && rightLevel < 5) {
+            noAudioDuration += 100; // Increment by 100 milliseconds
+          } else {
+            noAudioDuration = 0; // Reset counter if audio is detected
+          }
+
+          if (noAudioDuration >= alertDuration) {
+            alertText.textContent = 'Alert: No Audio Detected!';
+            alertText.classList.add('show');
+            if (alertSound.paused) {
+              alertSound.play(); // Play the alert sound if it's not already playing
             }
+          } else {
+            alertText.classList.remove('show');
+            alertSound.pause();
+            alertSound.currentTime = 0;
+          }
 
-            const leftChannelSum = leftChannelData.reduce((a, b) => a + b, 0);
-            const rightChannelSum = rightChannelData.reduce((a, b) => a + b, 0);
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          const frameData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          let totalLuminance = 0;
 
-            const leftChannelAvg = leftChannelSum / leftChannelData.length;
-            const rightChannelAvg = rightChannelSum / rightChannelData.length;
+          for (let i = 0; i < frameData.length; i += 4) {
+            const r = frameData[i];
+            const g = frameData[i + 1];
+            const b = frameData[i + 2];
+            const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+            totalLuminance += luminance;
+          }
 
-            const scaleAudioLevel = level => Math.min(100, Math.log10(1 + level) * 35); // Adjust multiplier for sensitivity
+          const avgLuminance = totalLuminance / (frameData.length / 4);
 
-            const leftLevel = scaleAudioLevel(leftChannelAvg);
-            const rightLevel = scaleAudioLevel(rightChannelAvg);
+          if (avgLuminance < 10) {
+            blackScreenDuration += 100;
+          } else {
+            blackScreenDuration = 0;
+          }
 
-            console.log(`Stream ${index} Left Audio Level: ${leftLevel}, Right Audio Level: ${rightLevel}`);
-
-            const leftBar = audioMeter.querySelector('.bar:first-child');
-            const rightBar = audioMeter.querySelector('.bar:last-child');
-
-            if (leftBar && rightBar) {
-                leftBar.style.height = `${leftLevel}%`;
-                rightBar.style.height = `${rightLevel}%`;
+          if (blackScreenDuration >= alertDuration) {
+            alertText.textContent = 'Alert: Black Screen Detected!';
+            alertText.classList.add('show');
+            if (alertSound.paused) {
+              alertSound.play();
             }
+          } else if (noAudioDuration < alertDuration) {
+            alertText.classList.remove('show');
+            alertSound.pause();
+            alertSound.currentTime = 0;
+          }
 
-            // If both channels are below the threshold, count as no audio
-            if (leftLevel < 5 && rightLevel < 5) {
-                noAudioDuration += 100; // Increment by 100 milliseconds
-            } else {
-                noAudioDuration = 0; // Reset counter if audio is detected
-            }
-
-            // Trigger alert if no audio is detected for the duration
-            if (noAudioDuration >= alertDuration) {
-                alertText.textContent = 'Alert: No Audio Detected!';
-                alertText.classList.add('show');
-                if (alertSound.paused) {
-                    alertSound.play(); // Play the alert sound if it's not already playing
-                }
-            } else {
-                alertText.classList.remove('show');
-                alertSound.pause();
-                alertSound.currentTime = 0; // Reset sound to the start
-            }
-
-            // Check for black screen
-            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            const frameData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-            let totalLuminance = 0;
-
-            for (let i = 0; i < frameData.length; i += 4) {
-                const r = frameData[i];
-                const g = frameData[i + 1];
-                const b = frameData[i + 2];
-                // Calculate luminance using standard luminance formula
-                const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-                totalLuminance += luminance;
-            }
-
-            const avgLuminance = totalLuminance / (frameData.length / 4);
-
-            // If the average luminance is below a threshold, consider it a black screen
-            if (avgLuminance < 10) { // Threshold for black screen
-                blackScreenDuration += 100; // Increment by 100 milliseconds
-            } else {
-                blackScreenDuration = 0; // Reset counter if a non-black screen is detected
-            }
-
-            // Trigger alert if black screen is detected for the duration
-            if (blackScreenDuration >= alertDuration) {
-                alertText.textContent = 'Alert: Black Screen Detected!';
-                alertText.classList.add('show');
-                if (alertSound.paused) {
-                    alertSound.play(); // Play the alert sound if it's not already playing
-                }
-            } else if (noAudioDuration < alertDuration) { // Reset alert if there was no previous audio alert
-                alertText.classList.remove('show');
-                alertSound.pause();
-                alertSound.currentTime = 0; // Reset sound to the start
-            }
+          // Update bitrate status
+          const bitrate = Math.floor(Math.random() * 2000) + 500; // Replace with actual bitrate calculation
+          bitrateStatus.textContent = `Bitrate: ${bitrate} kbps`;
         }
 
-        alerts[index] = setInterval(checkStream, 100); // Check every 100 milliseconds
+        alerts[index] = setInterval(checkStream, 100);
 
         audioContexts[index] = audioContext;
         analysers[index] = analyser;
-    } else {
+      } else {
         console.log(`Stream ${index} has no audio track`);
-    }
+      }
 
-    videoElement.onpause = () => {
+      videoElement.onpause = () => {
         checkStream();
-    };
-}
-
-
-  
-    function checkStreamTracks(stream, index) {
-      const audioTracks = stream.getAudioTracks();
-      const videoTracks = stream.getVideoTracks();
-
-      if (audioTracks.length > 0) {
-        console.log(`Stream ${index} has audio`);
-      } else {
-        console.log(`Stream ${index} has no audio`);
-      }
-
-      if (videoTracks.length > 0) {
-        console.log(`Stream ${index} has video`);
-      } else {
-        console.log(`Stream ${index} has no video`);
-      }
+      };
     }
+      
+        function checkStreamTracks(stream, index) {
+          const audioTracks = stream.getAudioTracks();
+          const videoTracks = stream.getVideoTracks();
 
-    document.getElementById('setLayout').addEventListener('click', function () {
-      const rows = parseInt(document.getElementById('numRows').value, 10);
-      const cols = parseInt(document.getElementById('numCols').value, 10);
-      createStreams(rows, cols);
-    });
+          if (audioTracks.length > 0) {
+            console.log(`Stream ${index} has audio`);
+          } else {
+            console.log(`Stream ${index} has no audio`);
+          }
 
-    // Initialize with 2 rows and 3 columns
-    createStreams(2, 3);
+          if (videoTracks.length > 0) {
+            console.log(`Stream ${index} has video`);
+          } else {
+            console.log(`Stream ${index} has no video`);
+          }
+        }
+
+        document.getElementById('setLayout').addEventListener('click', function () {
+          const rows = parseInt(document.getElementById('numRows').value, 10);
+          const cols = parseInt(document.getElementById('numCols').value, 10);
+          createStreams(rows, cols);
+        });
+
+        // Initialize with 2 rows and 3 columns
+        createStreams(2, 3);
   </script>
 
   <!-- Bootstrap JS and dependencies -->
