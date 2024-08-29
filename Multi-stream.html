@@ -79,44 +79,47 @@
       z-index: 0; /* Ensure video is above the audio meter background */
   }
 
-    .controls {
-      padding: 5px;
-      background-color: #1e1e1e;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #333;
-      height: 50px; /* Fixed height for controls */
-      position: relative;
-      z-index: 4; /* Ensure controls are above alert text */
-    }
-
-    .controls input,
-    .controls button {
-      background-color: #333;
-      color: #e0e0e0;
-      border: 1px solid #555;
-      margin-right: 5px;
-      height: 100%;
-    }
-
-    .controls input::placeholder {
-      color: #888;
-    }
-
-    .controls button {
-      border-radius: 4px;
-    }
-
-    .controls button.btn-success {
-      background-color: #4caf50;
-      border: none;
-    }
-
-    .controls button.btn-danger {
-      background-color: #f44336;
-      border: none;
-    }
+  .controls {
+    padding: 5px;
+    background-color: #1e1e1e;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #333;
+    height: 50px;
+    position: relative;
+    z-index: 4;
+    gap: 5px; /* Add space between elements */
+  }
+  
+  .controls input,
+  .controls button {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    height: 100%;
+    margin-right: 5px;
+  }
+  
+  .controls input {
+    width: calc(25% - 10px); /* Adjust width to fit three inputs */
+    margin-right: 0; /* Remove the default right margin */
+  }
+  
+  .controls button {
+    width: 70px; /* Set a fixed width for buttons */
+    padding: 5px; /* Adjust padding for better fit */
+  }
+  
+  .controls button.btn-success {
+    background-color: #4caf50;
+    border: none;
+  }
+  
+  .controls button.btn-danger {
+    background-color: #f44336;
+    border: none;
+  }
 
     .controls button:focus {
       outline: none;
@@ -136,6 +139,8 @@
 
     #header input,
     #header button {
+      font-size: 12px;
+      height: 30px;
       margin: 0 5px;
     }
 
@@ -201,23 +206,26 @@
 <body>
 
   <div class="container-fluid">
-    <div id="header">
-      <div class="form-group">
-        <label for="numRows">Rows:</label>
-        <input type="number" id="numRows" class="form-control" min="1" value="1" style="width: 80px;">
-        <label for="numCols">Columns:</label>
-        <input type="number" id="numCols" class="form-control" min="1" value="1" style="width: 80px;">
-        <button id="setLayout" class="btn btn-primary">Set Layout</button>
-      </div>
-    </div>
+    
 
     <div id="streamsContainer" data-rows="1" data-cols="1">
       <!-- Video elements will be injected here -->
     </div>
+    <div id="header">
+      <div class="form-group">
+        <label for="numRows">Rows:</label>
+        <input type="number" id="numRows" class="form-control" min="1" value="2" style="width: 80px;">
+        <label for="numCols">Columns:</label>
+        <input type="number" id="numCols" class="form-control" min="1" value="3" style="width: 80px;">
+        <button id="setLayout" class="btn btn-primary">Set Layout</button>
+      </div>
+    </div>
   </div>
 
-  <script src="wsrtcplayer.min.js"></script>
+  
 
+  <script src="wsrtcplayer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
     const alertSound = new Audio('alert.mp3'); // Ensure the path to your alert sound file is correct
     const alertThreshold = 50; // Set a threshold for audio levels
@@ -239,6 +247,14 @@
           stopConnectionLossAlert(index);
           break;
       }
+    }
+
+    function generateSdpUrl(appName, streamName, secretKey) {
+      const domainName = 'pull.tripledg.live';
+      const currentUnixTime = Math.floor(Date.now() / 1000);
+      const sdpInputValue = `${secretKey}/${appName}/${streamName}.sdp${currentUnixTime}`;
+      const sdpMd5Hash = CryptoJS.MD5(sdpInputValue).toString();
+      return `https://${domainName}/${appName}/${streamName}.sdp?wsSecret=${sdpMd5Hash}&wsTime=${currentUnixTime}`;
     }
 
     function triggerConnectionLossAlert(index) {
@@ -279,7 +295,7 @@
     video.id = `video${i}`;
     video.controls = false;
     video.autoplay = true;
-    video.muted = false;
+    video.muted = true;
     video.playsInline = true;
     streamContent.appendChild(video);
 
@@ -310,13 +326,31 @@
     const controls = document.createElement('div');
     controls.className = 'controls';
 
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'form-control';
-    input.placeholder = `Signal URL for Stream ${i}`;
-    input.value = `http://livep2p-pull.8686c.com/live/cctest${i}.sdp`;
-    input.id = `signal_url${i}`;
-    controls.appendChild(input);
+    //const input = document.createElement('input');
+    //input.type = 'text';
+    //input.className = 'form-control';
+    //input.placeholder = `Signal URL for Stream ${i}`;
+    //input.value = `http://livep2p-pull.8686c.com/live/cctest${i}.sdp`;
+    //input.id = `signal_url${i}`;
+    //controls.appendChild(input);
+
+        const appNameInput = document.createElement('input');
+        appNameInput.type = 'text';
+        appNameInput.placeholder = 'App Name';
+        appNameInput.id = `appName${i}`;
+        controls.appendChild(appNameInput);
+
+        const streamNameInput = document.createElement('input');
+        streamNameInput.type = 'text';
+        streamNameInput.placeholder = 'Stream Name';
+        streamNameInput.id = `streamName${i}`;
+        controls.appendChild(streamNameInput);
+
+        const secretKeyInput = document.createElement('input');
+        secretKeyInput.type = 'text';
+        secretKeyInput.placeholder = 'Secret Key';
+        secretKeyInput.id = `secretKey${i}`;
+        controls.appendChild(secretKeyInput);
 
     const playBtn = document.createElement('button');
     playBtn.className = 'btn btn-success';
@@ -354,8 +388,13 @@
       }
     
       const videoElement = document.getElementById(`video${index}`);
-      const signalUrl = document.getElementById(`signal_url${index}`).value;
-    
+      //const signalUrl = document.getElementById(`signal_url${index}`).value;
+      const appName = document.getElementById(`appName${index}`).value;
+      const streamName = document.getElementById(`streamName${index}`).value;
+      const secretKey = document.getElementById(`secretKey${index}`).value;
+
+      const signalUrl = generateSdpUrl(appName, streamName, secretKey);    
+
       const option = {
         element: videoElement,
         customerID: "bjweimiao",
@@ -460,7 +499,7 @@
           const leftLevel = scaleAudioLevel(leftChannelAvg);
           const rightLevel = scaleAudioLevel(rightChannelAvg);
 
-          console.log(`Stream ${index} Left Audio Level: ${leftLevel}, Right Audio Level: ${rightLevel}`);
+          //console.log(`Stream ${index} Left Audio Level: ${leftLevel}, Right Audio Level: ${rightLevel}`);
 
           const leftBar = audioMeter.querySelector('.bar:first-child');
           const rightBar = audioMeter.querySelector('.bar:last-child');

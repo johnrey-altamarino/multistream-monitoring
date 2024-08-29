@@ -27,11 +27,13 @@ video#localVideo {
 
 .bitrate-status {
   position: absolute;
-  bottom: 25px;
+  top: 325px; /* Adjust this value to move the bitrate above the controls */
   right: 20px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 2px 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 2px 5px;
   border-radius: 3px;
   font-size: 12px;
+  z-index: 4; /* Same z-index as audio level */
+
 }
