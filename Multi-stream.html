@@ -55,7 +55,7 @@
       display: flex;
       flex-direction: column;
       border: 1px solid #333;
-      border-radius: 8px;
+      
       background-color: #1e1e1e;
       overflow: hidden;
       height: 100%;
@@ -128,6 +128,10 @@
     #header label {
       margin: 0 5px;
       color: #e0e0e0;
+    }
+
+    .isp-info{
+        text-align: center;
     }
 
     #header .form-group {
@@ -211,6 +215,7 @@
     <div id="streamsContainer" data-rows="1" data-cols="1">
       <!-- Video elements will be injected here -->
     </div>
+    
     <div id="header">
       <div class="form-group">
         <label for="numRows">Rows:</label>
@@ -218,14 +223,30 @@
         <label for="numCols">Columns:</label>
         <input type="number" id="numCols" class="form-control" min="1" value="3" style="width: 80px;">
         <button id="setLayout" class="btn btn-primary">Set Layout</button>
-      </div>
+      </div>  
     </div>
+    <div class="isp-info" id="ispInfo">
+      Loading your ISP information...
+  </div> 
   </div>
 
   
 
   <script src="wsrtcplayer.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    async function fetchISPInfo() {
+        try {
+            const response = await fetch('https://ipinfo.io/json?token=89518cd2bfc944');
+            const data = await response.json();
+            document.getElementById('ispInfo').innerText = `Your ISP: ${data.org}`;
+        } catch (error) {
+            document.getElementById('ispInfo').innerText = 'Unable to retrieve ISP information';
+        }
+    }
+
+    fetchISPInfo();
+</script>
   <script>
     const alertSound = new Audio('alert.mp3'); // Ensure the path to your alert sound file is correct
     const alertThreshold = 50; // Set a threshold for audio levels
