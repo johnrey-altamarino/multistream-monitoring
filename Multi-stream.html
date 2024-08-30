@@ -560,8 +560,8 @@
           }
 
           // Update bitrate status
-          const bitrate = Math.floor(Math.random() * 2000) + 500; // Replace with actual bitrate calculation
-          bitrateStatus.textContent = `Bitrate: ${bitrate} kbps`;
+          // const bitrate = Math.floor(Math.random() * 2000) + 500; // Replace with actual bitrate calculation
+          // bitrateStatus.textContent = `Bitrate: ${bitrate} kbps`;
         }
 
         alerts[index] = setInterval(checkStream, 100);
@@ -571,6 +571,19 @@
       } else {
         console.log(`Stream ${index} has no audio track`);
       }
+
+        // Function to update the bitrate status
+          function updateBitrateStatus() {
+            const bitrate = Math.floor(Math.random() * 2000) + 500; // Replace with actual bitrate calculation
+            bitrateStatus.textContent = `Bitrate: ${bitrate} kbps`;
+          }
+
+          // Update bitrate status immediately when the script runs
+          updateBitrateStatus();
+
+          // Set an interval to update the bitrate status every second (1000 milliseconds)
+          setInterval(updateBitrateStatus, 1000);
+
 
       videoElement.onpause = () => {
         checkStream();
