@@ -387,6 +387,9 @@ function createStreams(rows, cols) {
         stopBtn.className = 'btn btn-danger';
         stopBtn.textContent = 'Stop';
         stopBtn.onclick = function() {
+            alertText.classList.remove('show');
+            alertSound.pause();
+            alertSound.currentTime = 0; // Reset the sound to the start
             stopStream(i);
         };
         controls.appendChild(stopBtn);
