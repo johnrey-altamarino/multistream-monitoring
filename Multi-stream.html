@@ -221,7 +221,7 @@
         <label for="numRows">Rows:</label>
         <input type="number" id="numRows" class="form-control" min="1" value="2" style="width: 80px;">
         <label for="numCols">Columns:</label>
-        <input type="number" id="numCols" class="form-control" min="1" value="3" style="width: 80px;">
+        <input type="number" id="numCols" class="form-control" min="1" value="4" style="width: 80px;">
         <button id="setLayout" class="btn btn-primary">Set Layout</button>
       </div>  
     </div>
@@ -359,16 +359,18 @@ function createStreams(rows, cols) {
         appNameInput.type = 'text';
         appNameInput.placeholder = 'App Name';
         appNameInput.id = `appName${i}`;
+        appNameInput.value = `A2A`;
         controls.appendChild(appNameInput);
 
         const streamNameInput = document.createElement('input');
         streamNameInput.type = 'text';
         streamNameInput.placeholder = 'Stream Name';
         streamNameInput.id = `streamName${i}`;
+        streamNameInput.value =`Stream${i}-Pri`;
         controls.appendChild(streamNameInput);
 
         const secretKeyInput = document.createElement('input');
-        secretKeyInput.type = 'text';
+        secretKeyInput.type = 'password';
         secretKeyInput.placeholder = 'Secret Key';
         secretKeyInput.id = `secretKey${i}`;
         controls.appendChild(secretKeyInput);
@@ -633,8 +635,8 @@ document.getElementById('setLayout').addEventListener('click', function() {
     createStreams(rows, cols);
 });
 
-// Initialize with 2 rows and 3 columns
-createStreams(2, 3);
+// Initialize with 2 rows and 4 columns
+createStreams(2, 4);
   </script>
 
   <!-- Bootstrap JS and dependencies -->
