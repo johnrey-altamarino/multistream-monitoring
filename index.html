@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC Monitoring</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/rtc_main.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" href="data:;base64,=">
+</head>
+
+<body>
+
+  <div class="container-fluid">
+    
+
+    <div id="streamsContainer" data-rows="1" data-cols="1">
+      <!-- Video elements will be injected here -->
+    </div>
+    
+    <div id="header">
+      <div class="form-group">
+        <label for="numRows">Rows:</label>
+        <input type="number" id="numRows" class="form-control" min="1" value="2" style="width: 80px;">
+        <label for="numCols">Columns:</label>
+        <input type="number" id="numCols" class="form-control" min="1" value="4" style="width: 80px;">
+        <button id="setLayout" class="btn btn-primary">Set Layout</button>
+        <button onclick="downloadLogs()" class="btn btn-info">Monitoring Logs</button>
+        <div id="globalControls" style="margin: 10px;"></div>
+
+        </div>  
+    </div>
+    <div class="isp-info" id="ispInfo">
+      Loading your ISP information...
+  </div> 
+  </div>
+
+  
+
+  <script src="wsrtcplayer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="ispinfo.js"></script>
+  <script src="webrtc.js"></script>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
